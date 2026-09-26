@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="accent">#2F80ED</color>
+    <color name="accent_stable">#2BD46D</color>
+    <color name="camera_background">#FF0B0D10</color>
+    <color name="camera_surface">#141821</color>
+    <color name="camera_surface_high">#1E2430</color>
+    <color name="camera_text_primary">#FFFFFFFF</color>
+    <color name="camera_text_secondary">#B3FFFFFF</color>
+    <color name="scrim">#66000000</color>
+    <color name="mask_dim">#99000000</color>
+    <color name="danger">#FFE5484D</color>
+    <color name="white">#FFFFFFFF</color>
+    <color name="black">#FF000000</color>
+    <color name="launcher_background">#FF12203A</color>
+</resources>

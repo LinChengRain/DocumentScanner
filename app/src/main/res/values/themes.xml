@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Theme.DocumentScanner" parent="Theme.Material3.Dark.NoActionBar">
+        <item name="colorPrimary">@color/accent</item>
+        <item name="colorOnPrimary">@color/white</item>
+        <item name="colorSecondary">@color/accent_stable</item>
+        <item name="android:statusBarColor">@color/camera_background</item>
+        <item name="android:navigationBarColor">@color/camera_background</item>
+        <item name="android:windowBackground">@color/camera_background</item>
+    </style>
+
+    <style name="Theme.DocumentScanner.Camera">
+        <item name="android:windowTranslucentNavigation">false</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+    </style>
+</resources>
