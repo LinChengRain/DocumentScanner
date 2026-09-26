@@ -116,11 +116,11 @@ Android 模拟器会在 HWCAP 与 `/proc/cpuinfo` 里上报 sve2/sme2，却实�
 （`Property '.sve' not found`）、`-no-accel` 被忽略，这个假阳性绕不过去。真机不受影响，
 要升级只需改回 `app/build.gradle` 里的版本号并在真机上验证。
 
-**关于下载速度**：`gradle/wrapper/gradle-wrapper.properties` 默认把 `distributionUrl`
-指向腾讯镜像（`services.gradle.org` 会 307 跳到 GitHub，国内直连常被限速到 20KB/s 以下）。
-换回官方源只需替换那一行；依赖仓库同理，根 `build.gradle` 的 `allprojects.repositories` 里把
-`mirrors.cloud.tencent.com/nexus/.../maven-public/` 排在 `google()` / `mavenCentral()` 之前
-（AGP 4.1 时代仓库声明仍在根工程，没有 `dependencyResolutionManagement`）。
+**关于下载速度**：依赖仓库的腾讯镜像由 `gradle.properties` 里的 `useChineseMirror` 控制（默认开），
+海外环境设为 `false` 或构建时加 `-PuseChineseMirror=false` 即回退 `google()` / `mavenCentral()` 官方源。
+`gradle/wrapper/gradle-wrapper.properties` 的 `distributionUrl` 仍默认指向腾讯镜像
+（`services.gradle.org` 会 307 跳到 GitHub，国内直连常被限速到 20KB/s 以下），换回官方源只需替换那一行。
+CI（`.github/workflows/ci.yml`）不走 wrapper，用 `setup-gradle` 直接装官方源的 7.6.4，并关闭依赖镜像。
 
 **APK 体积**：`ndk.abiFilters` 目前只留 `arm64-v8a`，debug 包约 28MB（R8 后的 release 约 23MB），
 大头是 OpenCV 的 `libopencv_java4.so`（约 21MB）。
@@ -247,6 +247,7 @@ com.documentscanner
 第三方组件保持各自的许可证，不受本仓库许可影响：OpenCV（Apache 2.0）、AndroidX 与 CameraX、
 Material Components（Apache 2.0）、Guava（Apache 2.0）。
 
-欢迎提 Issue 与 Pull Request。改动算法或渲染链路时请补对应用例——本仓库的测试是「变异验证」写出来的：
+欢迎提 Issue 与 Pull Request（仓库带 Issue / PR 模板）。每个 PR 会由 GitHub Actions 跑
+`testDebugUnitTest` + `assembleDebug`（官方源、JDK 17）。改动算法或渲染链路时请补对应用例——本仓库的测试是「变异验证」写出来的：
 每条断言都要能因对应的实现被改坏而失败，否则它不算是覆盖。纯逻辑放
 `app/src/test`（无需设备），要真实 Context / OpenCV / Activity 的放 `app/src/androidTest`。
