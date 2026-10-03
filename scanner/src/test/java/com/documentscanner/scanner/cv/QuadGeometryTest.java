@@ -103,6 +103,41 @@ public class QuadGeometryTest {
                 1000, 1000));
     }
 
+    /**
+     * 面积门限钉在画面 1%。上面那条用的是 12×12，占画面 0.0144%，任何高于它的门限都会让它通过——
+     * 它钉的是「极小要拒」，钉不住门限本身：实测把 MIN_USABLE_AREA_RATIO 从 0.01 降到 0.001，
+     * 整轮用例一条不红。这里成对给 1.21% 与 0.9025%，两边其余条件（凸、内角 90°）都一样，
+     * 所以动门限必定当场红。
+     */
+    @Test
+    public void isUsableQuad_gatesTheAreaAtOnePercentOfTheFrame() {
+        assertTrue("画面 1.21% 的选区该放行",
+                QuadGeometry.isUsableQuad(square(110), 1000, 1000));
+        assertFalse("画面 0.9025% 的选区该拒",
+                QuadGeometry.isUsableQuad(square(95), 1000, 1000));
+    }
+
+    /**
+     * 内角门限钉在 8°，同样成对。两个四边形都凸、面积都占画面 6.8% 以上（面积那条不构成干扰），
+     * 差别只在最尖那个角：9.48° 与 6.50°。
+     */
+    @Test
+    public void isUsableQuad_gatesTheSharpestCornerAtEightDegrees() {
+        Point[] eightPointNine = new Point[]{
+                new Point(0, 0), new Point(1000, 0), new Point(1200, 70), new Point(1000, 167)};
+        Point[] sixPointFive = new Point[]{
+                new Point(0, 0), new Point(1000, 0), new Point(1200, 70), new Point(1000, 114)};
+
+        assertTrue("最小内角 9.48° 该放行", QuadGeometry.isUsableQuad(eightPointNine, 1000, 1000));
+        assertFalse("最小内角 6.50° 该拒", QuadGeometry.isUsableQuad(sixPointFive, 1000, 1000));
+    }
+
+    private static Point[] square(int side) {
+        return new Point[]{
+                new Point(0, 0), new Point(side, 0),
+                new Point(side, side), new Point(0, side)};
+    }
+
     @Test
     public void isUsableQuad_rejectsCollapsedCorner() {
         assertFalse(QuadGeometry.isUsableQuad(new Point[]{

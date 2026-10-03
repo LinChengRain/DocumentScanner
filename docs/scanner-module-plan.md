@@ -303,7 +303,7 @@ G1 复核补一句，免得后来人按 grep 下结论：演示宿主现在**没
 入参类型就在 `cv` 包里，任何真去用体积档的宿主都必然 `import com.documentscanner.scanner.cv.ImageBudget`。
 「三处」按公开面算，不按 demo 用没用算。
 
-## 10. 进度（截至 G1）
+## 10. 进度（截至 G2）
 
 - B1 `14c5a3f`：`:scanner` 骨架 + `util/`。
 - B2 `d414c58`：`cv/` + `camera/`；`PageRenderer` 因依赖 `model.ScanPage` 暂留宿主。
@@ -598,3 +598,24 @@ G1 复核补一句，免得后来人按 grep 下结论：演示宿主现在**没
     任何高于 0.000144 的门限都能让它通过，所以这条断言钉的是「极小要拒」而不是「门限在哪」。
     与 `MIN_DECODE_EDGE`、`MAX_ATTEMPTS` 同一类：数值是产品判断，没有边界成对的用例守着。
 
+- G2（用例补强，基线 `e8145a3`）：收掉 G1 那条等价变种，并把同一类「断言只跟常量自己比」的自指用例一次清完。
+  - 三条新 JVM 用例、钉四个数：`isUsableQuad_gatesTheAreaAtOnePercentOfTheFrame`（成对给占画面
+    1.21% 与 0.9025% 的四边形，凸度内角都一样，只差面积）、
+    `isUsableQuad_gatesTheSharpestCornerAtEightDegrees`（9.48° 放行 / 6.50° 拒，都凸、面积都够）、
+    `theFloorAndTheCapAreTheShippedNumbers`（字面量钉 `MIN_DECODE_EDGE=600`、`MAX_ATTEMPTS=4`）。
+    边界那两个四边形不是猜的：按 `QuadGeometry` 同一套鞋带面积/最小内角/凸性公式先在脚本里算出来再写进用例。
+  - 逐个下毒，每次只红对应那一条：面积门限 0.01→0.001（M1，G1 记下的那条存活变种）与 →0.02（M2，往严也抓）、
+    内角 8→5（M3）、600→300（M4，就是 F6 认下来的那条）、4→5（M5）。
+    仍然存活的只剩 M6：`PdfExporter` 里 `write >= PdfSizeFit.MAX_ATTEMPTS` 改成 `>` 全绿——
+    缩边循环住在 `PdfExporter`、`PdfSizeFit` 只暴露单轮算术，要钉它得把整轮循环搬成可注入的纯函数，
+    那是另一次边界改动，不在这一批。
+  - 字面量那条要讲清它买到的是什么：拦得住「顺手改数字忘了改文档」的漂移，拦不住「这个值本身选错」，
+    所以 README「已知边界」里原来那句「600 以下就不是扫描件没有断言守着」已改写成这个口径。
+  - 一次差点误判成回归：补完用例后整轮门禁 5 例 instrumentation 失败（`ScanActivityFlowTest` 四例
+    各卡 31s 超时、`ScanActivityCameraHandoffTest` 一例页数 `expected:<2> but was:<3>`）。根因不在代码——
+    是前面几轮**单跑变异**留下的设备侧脏会话：`ScanActivity` 起来先恢复上次会话，于是页面落进了恢复出来的
+    那份 `ScanSession`，测试自己那份永远等不到页。清空应用数据后 101 例全绿。**教训：变异脚本单跑之后
+    必须卸载或 `pm clear` 再跑整轮**，否则下一轮红的是环境。
+  - 用例数同步：JVM 71→74（`QuadGeometryTest` 11→13、`PdfSizeFitTest` 24→25），总数 176→179；
+    README §1 的分文件计数与 §4「拆开之后 25 条」都跟着改。整轮复跑（同一台 emulator-5554）：
+    四项构建 + JVM 74 + instrumentation 105 全绿，release APK 24,301,525 B、AAR 221,963 B 与既有基线一致。

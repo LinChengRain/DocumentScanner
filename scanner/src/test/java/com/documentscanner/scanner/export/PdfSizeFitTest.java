@@ -173,6 +173,22 @@ public class PdfSizeFitTest {
         assertTrue("轮数该远低于上限：" + rounds, rounds <= PdfSizeFit.MAX_ATTEMPTS);
     }
 
+    /**
+     * 下限与轮数是被定下来的两个数，不是实现顺手起的名字。
+     *
+     * <p>上面那批用例断言的都是「到下限就停」「不超过上限」这类<b>行为</b>，判据里写的就是常量本身
+     * ——把 {@code MIN_DECODE_EDGE} 从 600 改成 300，它们照旧全绿（F6 实测过这条等价变种并在文档里认下来了），
+     * 可 A4 短边 300px 已经不是能看的扫描件；把 {@code MAX_ATTEMPTS} 改成 5，红字也不会出现，
+     * 而那是「用户最多为此多等一轮」的承诺被改口。
+     *
+     * <p>所以这里把数钉成字面量：想动它，就得连这一条一起改，改动于是变成一次明示而不是一次漂移。
+     */
+    @Test
+    public void theFloorAndTheCapAreTheShippedNumbers() {
+        assertEquals(600, PdfSizeFit.MIN_DECODE_EDGE);
+        assertEquals(4, PdfSizeFit.MAX_ATTEMPTS);
+    }
+
     // ---- 斜率标定 ----------------------------------------------------------
 
     /** 第一枪没有可比的对，只能用先验——先验偏大是有意的，边只能降不能升。 */
