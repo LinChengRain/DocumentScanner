@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- 扫描四屏自带主题。原来它们靠点号隐式继承宿主的 Theme.DocumentScanner，
+         进模块后继承不到宿主的东西，父主题与配色只能自己写全。
+         这一步不只是搬迁：清单里不写 theme 的 Activity 会去吃宿主的 application theme，
+         模块单独跑 androidTest（stub APK 没有宿主主题）时 MaterialButton 直接抛
+         "The style on this component requires your app theme to be Theme.MaterialComponents"，
+         换个 Light 主题的宿主同样会在裁剪页崩。所以四屏在模块清单里把主题写死。 -->
+    <style name="Theme.Scanner" parent="Theme.Material3.Dark.NoActionBar">
+        <item name="colorPrimary">@color/scanner_accent</item>
+        <item name="colorOnPrimary">@color/scanner_white</item>
+        <item name="colorSecondary">@color/scanner_accent_stable</item>
+        <item name="android:statusBarColor">@color/scanner_camera_background</item>
+        <item name="android:navigationBarColor">@color/scanner_camera_background</item>
+        <item name="android:windowBackground">@color/scanner_camera_background</item>
+    </style>
+
+    <style name="Theme.Scanner.Camera">
+        <item name="android:windowTranslucentNavigation">false</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+    </style>
+</resources>

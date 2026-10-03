@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 扫描组件自带的一份，宿主同名资源可覆盖。 -->
+<resources>
+    <color name="scanner_accent">#2F80ED</color>
+    <color name="scanner_accent_stable">#2BD46D</color>
+    <color name="scanner_camera_background">#FF0B0D10</color>
+    <color name="scanner_camera_surface">#141821</color>
+    <color name="scanner_camera_surface_high">#1E2430</color>
+    <color name="scanner_camera_text_primary">#FFFFFFFF</color>
+    <color name="scanner_camera_text_secondary">#B3FFFFFF</color>
+    <color name="scanner_scrim">#66000000</color>
+    <color name="scanner_mask_dim">#99000000</color>
+    <color name="scanner_danger">#FFE5484D</color>
+    <color name="scanner_white">#FFFFFFFF</color>
+    <color name="scanner_black">#FF000000</color>
+</resources>

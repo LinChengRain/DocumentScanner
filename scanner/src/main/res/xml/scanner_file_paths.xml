@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 模块自带 provider 后，这里的目录名就是组件对外的分享契约：
+     只有落在这些前缀下的文件才能换成 content:// 交给别的应用。 -->
+<paths>
+    <!-- 会话产物（originals / warps / results / thumbs）。
+         这个前缀与 ScanSession.ROOT_DIR 是同一个字符串，改一边必须改另一边
+         （XML 引不到 Java 常量，对不上只会在分享时静默失败）。 -->
+    <cache-path
+        name="scan_session"
+        path="scan_session/" />
+    <!-- 导出的 PDF 成品 -->
+    <files-path
+        name="export"
+        path="export/" />
+    <!-- 相册保存的老接口（GallerySaver.saveLegacy）把文件落在外部目录并返回 file://，
+         一旦哪天改成走 provider，就得靠这条；现在没人用，删了就是给分享留坑。 -->
+    <external-files-path
+        name="external_files"
+        path="." />
+</paths>

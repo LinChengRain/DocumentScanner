@@ -6,6 +6,7 @@ import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.Settings;
+import android.widget.Toast;
 import android.view.View;
 
 import androidx.activity.result.ActivityResultLauncher;
@@ -15,18 +16,26 @@ import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.documentscanner.R;
-import com.documentscanner.cv.Cv;
 import com.documentscanner.databinding.ActivityMainBinding;
-import com.documentscanner.model.ScanSession;
+import com.documentscanner.scanner.api.Scanner;
+import com.documentscanner.scanner.api.ScannerEngine;
+import com.documentscanner.scanner.api.ScannerSession;
+import com.documentscanner.scanner.model.ScanSession;
 import com.documentscanner.ui.adapter.SessionAdapter;
-import com.documentscanner.util.Ui;
 
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 import java.util.ArrayList;
 import java.util.List;
 
-/** 首页：新扫描入口 + 历史会话列表，并把相机权限流程走顺。 */
+/**
+ * 首页：新扫描入口 + 历史会话列表，并把相机权限流程走顺。
+ *
+ * <p>这一屏只通过 {@code com.documentscanner.scanner.api} 碰扫描组件，加上
+ * {@link ScanSession.Info} 这一个数据类型；不起裸 Intent、不调 {@code ScanSession.startNew}。
+ * 两者必须成对（先切会话再起屏），散在宿主里就变成「漏写前半句时接着上一份会话写」这种
+ * 只有真机能发现的 bug。
+ */
 public class MainActivity extends AppCompatActivity implements SessionAdapter.Listener {
 
     private ActivityMainBinding binding;
@@ -40,7 +49,7 @@ public class MainActivity extends AppCompatActivity implements SessionAdapter.Li
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-        binding.tvEngine.setText(getString(R.string.main_engine, Cv.version()));
+        binding.tvEngine.setText(getString(R.string.main_engine, ScannerEngine.version()));
         binding.btnStart.setOnClickListener(v -> startScanning());
 
         adapter = new SessionAdapter(sessions, this);
@@ -64,7 +73,7 @@ public class MainActivity extends AppCompatActivity implements SessionAdapter.Li
     }
 
     private void refreshHistory() {
-        List<ScanSession.Info> history = ScanSession.history(this);
+        List<ScanSession.Info> history = ScannerSession.list(this);
         sessions.clear();
         sessions.addAll(history);
         adapter.notifyDataSetChanged();
@@ -75,8 +84,7 @@ public class MainActivity extends AppCompatActivity implements SessionAdapter.Li
 
     @Override
     public void onSessionClick(ScanSession.Info info) {
-        ScanSession.open(this, info.sessionId);
-        startActivity(new Intent(this, PageListActivity.class));
+        Scanner.openPages(this, info.sessionId);
     }
 
     @Override
@@ -85,11 +93,14 @@ public class MainActivity extends AppCompatActivity implements SessionAdapter.Li
                 .setTitle(R.string.main_session_delete_title)
                 .setMessage(getString(R.string.main_session_delete_body,
                         info.title == null ? getString(R.string.main_session_untitled) : info.title))
-                .setNegativeButton(R.string.cancel, null)
-                .setPositiveButton(R.string.delete, (dialog, which) -> {
-                    ScanSession.deleteSession(this, info.sessionId);
+                .setNegativeButton(R.string.scanner_cancel, null)
+                .setPositiveButton(R.string.scanner_delete, (dialog, which) -> {
+                    ScannerSession.delete(this, info.sessionId);
                     refreshHistory();
-                    Ui.toast(this, getString(R.string.main_session_deleted, info.sessionId));
+                    Toast.makeText(this,
+                                    getString(R.string.main_session_deleted, info.sessionId),
+                                    Toast.LENGTH_SHORT)
+                            .show();
                 })
                 .show();
     }
@@ -102,10 +113,10 @@ public class MainActivity extends AppCompatActivity implements SessionAdapter.Li
         }
         if (shouldShowRequestPermissionRationale(Manifest.permission.CAMERA)) {
             new MaterialAlertDialogBuilder(this)
-                    .setTitle(R.string.permission_camera_title)
-                    .setMessage(R.string.permission_camera_body)
-                    .setNegativeButton(R.string.cancel, null)
-                    .setPositiveButton(R.string.permission_grant,
+                    .setTitle(R.string.scanner_permission_camera_title)
+                    .setMessage(R.string.scanner_permission_camera_body)
+                    .setNegativeButton(R.string.scanner_cancel, null)
+                    .setPositiveButton(R.string.scanner_permission_grant,
                             (dialog, which) -> cameraPermission.launch(Manifest.permission.CAMERA))
                     .show();
             return;
@@ -114,16 +125,15 @@ public class MainActivity extends AppCompatActivity implements SessionAdapter.Li
     }
 
     private void openScanner() {
-        ScanSession.startNew(this);
-        startActivity(new Intent(this, ScanActivity.class));
+        Scanner.startNewScan(this);
     }
 
     private void showPermissionRationale() {
         new MaterialAlertDialogBuilder(this)
-                .setTitle(R.string.permission_camera_title)
-                .setMessage(R.string.permission_denied)
-                .setNegativeButton(R.string.cancel, null)
-                .setPositiveButton(R.string.permission_settings, (dialog, which) -> {
+                .setTitle(R.string.scanner_permission_camera_title)
+                .setMessage(R.string.scanner_permission_denied)
+                .setNegativeButton(R.string.scanner_cancel, null)
+                .setPositiveButton(R.string.scanner_permission_settings, (dialog, which) -> {
                     Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
                             Uri.fromParts("package", getPackageName(), null));
                     if (intent.resolveActivity(getPackageManager()) != null) {

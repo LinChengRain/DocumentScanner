@@ -9,8 +9,8 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.documentscanner.R;
 import com.documentscanner.databinding.ItemSessionBinding;
-import com.documentscanner.model.ScanSession;
-import com.documentscanner.ui.PageImageLoader;
+import com.documentscanner.scanner.model.ScanSession;
+import com.documentscanner.scanner.ui.PageImageLoader;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -54,7 +54,7 @@ public class SessionAdapter extends RecyclerView.Adapter<SessionAdapter.Holder> 
                 .getString(R.string.main_session_meta, info.pages,
                         dateFormat.format(new Date(info.createdAt))));
         if (info.cover == null) {
-            holder.binding.imgCover.setImageResource(R.drawable.ic_pdf);
+            holder.binding.imgCover.setImageResource(R.drawable.scanner_ic_pdf);
         } else {
             loader.loadInto(holder.binding.imgCover, info.cover);
         }

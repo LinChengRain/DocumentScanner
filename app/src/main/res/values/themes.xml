@@ -1,17 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- 宿主自己的主题（首页）。扫描四屏用的是 :scanner 自带的 Theme.Scanner*，
+         两边看着重复是刻意的：模块不能依赖宿主的 theme，宿主也不必跟着模块的观感走。 -->
     <style name="Theme.DocumentScanner" parent="Theme.Material3.Dark.NoActionBar">
-        <item name="colorPrimary">@color/accent</item>
-        <item name="colorOnPrimary">@color/white</item>
-        <item name="colorSecondary">@color/accent_stable</item>
-        <item name="android:statusBarColor">@color/camera_background</item>
-        <item name="android:navigationBarColor">@color/camera_background</item>
-        <item name="android:windowBackground">@color/camera_background</item>
-    </style>
-
-    <style name="Theme.DocumentScanner.Camera">
-        <item name="android:windowTranslucentNavigation">false</item>
-        <item name="android:statusBarColor">@android:color/transparent</item>
-        <item name="android:navigationBarColor">@android:color/transparent</item>
+        <item name="colorPrimary">@color/scanner_accent</item>
+        <item name="colorOnPrimary">@color/scanner_white</item>
+        <item name="colorSecondary">@color/scanner_accent_stable</item>
+        <item name="android:statusBarColor">@color/scanner_camera_background</item>
+        <item name="android:navigationBarColor">@color/scanner_camera_background</item>
+        <item name="android:windowBackground">@color/scanner_camera_background</item>
     </style>
 </resources>

@@ -2,15 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.documentscanner">
 
-    <uses-permission android:name="android.permission.CAMERA" />
-
-    <!-- 无摄像头的设备（如部分平板/模拟器）也允许安装，只是扫描功能不可用 -->
-    <uses-feature
-        android:name="android.hardware.camera"
-        android:required="false" />
-    <uses-feature
-        android:name="android.hardware.camera.autofocus"
-        android:required="false" />
+    <!-- CAMERA 权限与 uses-feature 由 :scanner 声明并合并进来：B4 之后
+         相机相关代码全部在模块内，宿主不再需要自己声明。 -->
 
     <application
         android:name=".DocumentScannerApp"
@@ -34,37 +27,10 @@
             </intent-filter>
         </activity>
 
-        <activity
-            android:name=".ui.ScanActivity"
-            android:exported="false"
-            android:screenOrientation="portrait"
-            android:theme="@style/Theme.DocumentScanner.Camera" />
-
-        <activity
-            android:name=".ui.CropActivity"
-            android:exported="false"
-            android:screenOrientation="portrait"
-            android:theme="@style/Theme.DocumentScanner.Camera" />
-
-        <activity
-            android:name=".ui.PageListActivity"
-            android:exported="false"
-            android:screenOrientation="portrait" />
-
-        <activity
-            android:name=".ui.PdfPreviewActivity"
-            android:exported="false"
-            android:screenOrientation="portrait" />
-
-        <provider
-            android:name="androidx.core.content.FileProvider"
-            android:authorities="${applicationId}.fileprovider"
-            android:exported="false"
-            android:grantUriPermissions="true">
-            <meta-data
-                android:name="android.support.FILE_PROVIDER_PATHS"
-                android:resource="@xml/file_paths" />
-        </provider>
+        <!-- 扫描四页（ScanActivity/CropActivity/PageListActivity/PdfPreviewActivity）
+             与 FileProvider 都由 :scanner 声明，合并进这份 manifest。
+             provider 的 authority 用 ${applicationId} 占位符，宿主不要重复声明，
+             否则 authority 撞车。 -->
     </application>
 
 </manifest>

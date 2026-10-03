@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/camera_background"
+    android:background="@color/scanner_camera_background"
     android:fillViewport="true"
     android:fitsSystemWindows="true">
 
@@ -27,7 +27,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             android:text="@string/main_headline"
-            android:textColor="@color/camera_text_primary"
+            android:textColor="@color/scanner_camera_text_primary"
             android:textSize="28sp"
             android:textStyle="bold" />
 
@@ -37,7 +37,7 @@
             android:layout_marginTop="10dp"
             android:lineSpacingExtra="4dp"
             android:text="@string/main_subheadline"
-            android:textColor="@color/camera_text_secondary"
+            android:textColor="@color/scanner_camera_text_secondary"
             android:textSize="15sp" />
 
         <com.google.android.material.button.MaterialButton
@@ -48,7 +48,7 @@
             android:text="@string/main_start"
             android:textSize="17sp"
             app:cornerRadius="16dp"
-            app:icon="@drawable/ic_auto_detect"
+            app:icon="@drawable/scanner_ic_auto_detect"
             app:iconGravity="textStart" />
 
         <TextView
@@ -57,7 +57,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="28dp"
             android:text="@string/main_history_title"
-            android:textColor="@color/camera_text_primary"
+            android:textColor="@color/scanner_camera_text_primary"
             android:textSize="17sp"
             android:textStyle="bold"
             android:visibility="gone" />
@@ -75,7 +75,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="32dp"
-            android:background="@drawable/bg_card"
+            android:background="@drawable/scanner_bg_card"
             android:gravity="center_vertical"
             android:orientation="horizontal"
             android:padding="16dp">
@@ -84,7 +84,7 @@
                 android:layout_width="28dp"
                 android:layout_height="28dp"
                 android:contentDescription="@null"
-                android:src="@drawable/ic_auto_detect" />
+                android:src="@drawable/scanner_ic_auto_detect" />
 
             <LinearLayout
                 android:layout_width="0dp"
@@ -97,7 +97,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/main_feature_auto_title"
-                    android:textColor="@color/camera_text_primary"
+                    android:textColor="@color/scanner_camera_text_primary"
                     android:textSize="16sp"
                     android:textStyle="bold" />
 
@@ -106,7 +106,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="4dp"
                     android:text="@string/main_feature_auto_body"
-                    android:textColor="@color/camera_text_secondary"
+                    android:textColor="@color/scanner_camera_text_secondary"
                     android:textSize="13sp" />
             </LinearLayout>
         </LinearLayout>
@@ -115,7 +115,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
-            android:background="@drawable/bg_card"
+            android:background="@drawable/scanner_bg_card"
             android:gravity="center_vertical"
             android:orientation="horizontal"
             android:padding="16dp">
@@ -124,7 +124,7 @@
                 android:layout_width="28dp"
                 android:layout_height="28dp"
                 android:contentDescription="@null"
-                android:src="@drawable/ic_grid" />
+                android:src="@drawable/scanner_ic_grid" />
 
             <LinearLayout
                 android:layout_width="0dp"
@@ -137,7 +137,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/main_feature_quad_title"
-                    android:textColor="@color/camera_text_primary"
+                    android:textColor="@color/scanner_camera_text_primary"
                     android:textSize="16sp"
                     android:textStyle="bold" />
 
@@ -146,7 +146,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="4dp"
                     android:text="@string/main_feature_quad_body"
-                    android:textColor="@color/camera_text_secondary"
+                    android:textColor="@color/scanner_camera_text_secondary"
                     android:textSize="13sp" />
             </LinearLayout>
         </LinearLayout>
@@ -155,7 +155,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
-            android:background="@drawable/bg_card"
+            android:background="@drawable/scanner_bg_card"
             android:gravity="center_vertical"
             android:orientation="horizontal"
             android:padding="16dp">
@@ -164,7 +164,7 @@
                 android:layout_width="28dp"
                 android:layout_height="28dp"
                 android:contentDescription="@null"
-                android:src="@drawable/ic_image" />
+                android:src="@drawable/scanner_ic_image" />
 
             <LinearLayout
                 android:layout_width="0dp"
@@ -177,7 +177,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/main_feature_filter_title"
-                    android:textColor="@color/camera_text_primary"
+                    android:textColor="@color/scanner_camera_text_primary"
                     android:textSize="16sp"
                     android:textStyle="bold" />
 
@@ -186,7 +186,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="4dp"
                     android:text="@string/main_feature_filter_body"
-                    android:textColor="@color/camera_text_secondary"
+                    android:textColor="@color/scanner_camera_text_secondary"
                     android:textSize="13sp" />
             </LinearLayout>
         </LinearLayout>
@@ -195,7 +195,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
-            android:background="@drawable/bg_card"
+            android:background="@drawable/scanner_bg_card"
             android:gravity="center_vertical"
             android:orientation="horizontal"
             android:padding="16dp">
@@ -204,7 +204,7 @@
                 android:layout_width="28dp"
                 android:layout_height="28dp"
                 android:contentDescription="@null"
-                android:src="@drawable/ic_pdf" />
+                android:src="@drawable/scanner_ic_pdf" />
 
             <LinearLayout
                 android:layout_width="0dp"
@@ -217,7 +217,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/main_feature_pdf_title"
-                    android:textColor="@color/camera_text_primary"
+                    android:textColor="@color/scanner_camera_text_primary"
                     android:textSize="16sp"
                     android:textStyle="bold" />
 
@@ -226,7 +226,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="4dp"
                     android:text="@string/main_feature_pdf_body"
-                    android:textColor="@color/camera_text_secondary"
+                    android:textColor="@color/scanner_camera_text_secondary"
                     android:textSize="13sp" />
             </LinearLayout>
         </LinearLayout>
@@ -236,7 +236,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="28dp"
             android:text="@string/main_how_title"
-            android:textColor="@color/camera_text_primary"
+            android:textColor="@color/scanner_camera_text_primary"
             android:textSize="17sp"
             android:textStyle="bold" />
 
@@ -247,7 +247,7 @@
             android:layout_marginTop="8dp"
             android:lineSpacingExtra="6dp"
             android:text="@string/main_how_body"
-            android:textColor="@color/camera_text_secondary"
+            android:textColor="@color/scanner_camera_text_secondary"
             android:textSize="14sp" />
 
         <TextView

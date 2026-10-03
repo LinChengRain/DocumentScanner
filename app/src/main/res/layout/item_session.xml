@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginTop="8dp"
-    android:background="@drawable/bg_card"
+    android:background="@drawable/scanner_bg_card"
     android:gravity="center_vertical"
     android:orientation="horizontal"
     android:padding="12dp">
@@ -13,10 +13,10 @@
         android:id="@+id/img_cover"
         android:layout_width="44dp"
         android:layout_height="56dp"
-        android:background="@drawable/bg_thumbnail"
+        android:background="@drawable/scanner_bg_thumbnail"
         android:contentDescription="@null"
         android:scaleType="centerCrop"
-        android:src="@drawable/ic_pdf" />
+        android:src="@drawable/scanner_ic_pdf" />
 
     <LinearLayout
         android:layout_width="0dp"
@@ -31,7 +31,7 @@
             android:layout_height="wrap_content"
             android:ellipsize="end"
             android:singleLine="true"
-            android:textColor="@color/camera_text_primary"
+            android:textColor="@color/scanner_camera_text_primary"
             android:textSize="15sp"
             android:textStyle="bold" />
 
@@ -40,7 +40,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="3dp"
-            android:textColor="@color/camera_text_secondary"
+            android:textColor="@color/scanner_camera_text_secondary"
             android:textSize="12sp" />
     </LinearLayout>
 
@@ -48,8 +48,8 @@
         android:id="@+id/btn_session_menu"
         android:layout_width="36dp"
         android:layout_height="36dp"
-        android:background="@drawable/bg_circle_button"
-        android:contentDescription="@string/pages_menu"
+        android:background="@drawable/scanner_bg_circle_button"
+        android:contentDescription="@string/scanner_pages_menu"
         android:padding="8dp"
-        android:src="@drawable/ic_more" />
+        android:src="@drawable/scanner_ic_more" />
 </LinearLayout>

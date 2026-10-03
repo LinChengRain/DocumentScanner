@@ -1,0 +1,85 @@
+apply plugin: 'com.android.library'
+
+def cameraXVersion = '1.1.0'
+
+android {
+    // 与 :app 同一基线（AGP 4.1.3 / JDK 17 语言级别 1.8 / compileSdk 31）。
+    // 依赖不许越过 minCompileSdk=31 那一档，理由见 app/build.gradle 的注释。
+    compileSdkVersion 31
+
+    defaultConfig {
+        minSdkVersion 24
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        // 宿主 minify 时带上模块自己需要的 keep；包名必须跟模块包名一致，写错只会运行时才发现
+        consumerProguardFiles 'consumer-rules.pro'
+    }
+
+    buildTypes {
+        debug {
+            minifyEnabled false
+        }
+        release {
+            // 库模块不做独立 minify：R8 由 :app 统一跑（shrinkResources 只能在 app 上开）
+            minifyEnabled false
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    buildFeatures {
+        viewBinding true
+    }
+
+    sourceSets {
+        // 会话测试脚手架（SessionFixtures）放在 androidTestShared：模块自己的用例要用，
+        // 宿主的 instrumentation 用例（首页历史列表）也要用。AGP 4.1 没有 testFixtures 这套
+        // 发布机制，两个模块各引一份源码，避免抄两份改一边忘一边。
+        androidTest.java.srcDirs += 'src/androidTestShared/java'
+    }
+
+    lintOptions {
+        abortOnError false
+    }
+}
+
+dependencies {
+    // 文档边缘检测 / 透视矫正 / 图像增强
+    // 4.12 起 arm64 构建会按 HWCAP 派发到 SVE 内核；Android 模拟器（Apple 芯片 +
+    // Hypervisor）上报了 SVE2 却无法执行，Mat.convertTo 直接 SIGILL。
+    // 4.11 起的 classes.jar 是 Java 17 字节码（major 61），AGP 4.1 的 D8 读不了，故停在 4.10.0。
+    implementation 'org.opencv:opencv:4.10.0'
+
+    // 相机：预览 + 逐帧分析 + 高分辨率拍照
+    implementation "androidx.camera:camera-core:${cameraXVersion}"
+    implementation "androidx.camera:camera-camera2:${cameraXVersion}"
+    implementation "androidx.camera:camera-lifecycle:${cameraXVersion}"
+    implementation "androidx.camera:camera-view:${cameraXVersion}"
+    // CameraX 的 getInstance() 返回 guava 的 ListenableFuture，而 camera-core 1.1.0 只以
+    // compile 作用域带上 com.google.guava:listenablefuture:1.0 这个空桩，编译期看不到该接口。
+    implementation 'com.google.guava:guava:31.0.1-android'
+
+    // ImageIO 读 EXIF 方向需要 exifinterface
+    implementation 'androidx.exifinterface:exifinterface:1.3.3'
+    implementation 'androidx.annotation:annotation:1.2.0'
+    // model/ + export/：FileProvider 在 androidx.core 里，manifest 声明的 provider
+    // 也要求合并后 classpath 上有它。
+    implementation 'androidx.core:core:1.7.0'
+
+    // 四屏 UI（B4）。版本与 :app 必须同一档：都是 minCompileSdk=31 的上限，理由见
+    // app/build.gradle 的注释；两边各挑一档会在资源合并/R 生成处撞版本。
+    implementation 'androidx.appcompat:appcompat:1.4.2'
+    implementation 'androidx.activity:activity:1.4.0'
+    implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
+    implementation 'androidx.recyclerview:recyclerview:1.2.1'
+    implementation 'com.google.android.material:material:1.5.0'
+
+    testImplementation 'junit:junit:4.13.2'
+    // instrumentation 三件套停在 1.5.x：同退到 1.4.0 世代会把 androidx.test:monitor 拉到 1.4.0，
+    // Android 15 真机上 ActivityScenario 拉不起 Activity（实测见 README §1）
+    androidTestImplementation 'androidx.test.ext:junit:1.1.5'
+    androidTestImplementation 'androidx.test:runner:1.5.2'
+    androidTestImplementation 'androidx.test:core:1.5.0'
+}

@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.documentscanner.scanner">
+    <!-- AGP 4.1.3 没有 namespace DSL，库模块的包名只能写在 manifest 里。
+         这里合并进宿主的 AndroidManifest：provider 与它的路径配置由模块自带，
+         宿主不需要再声明 FileProvider 就能分享扫描产物。 -->
+
+    <!-- CAMERA 由模块声明：宿主只要 project(':scanner')，权限就跟着合并过去。
+         放在模块侧还有个副作用是清单一眼能看出「这个组件需要相机」。 -->
+    <uses-permission android:name="android.permission.CAMERA" />
+
+    <!-- 无摄像头的设备（如部分平板/模拟器）也允许安装，只是扫描功能不可用 -->
+    <uses-feature
+        android:name="android.hardware.camera"
+        android:required="false" />
+    <uses-feature
+        android:name="android.hardware.camera.autofocus"
+        android:required="false" />
+
+    <!-- provider 由模块声明，宿主零配置；authority 用 ${applicationId} 占位符，
+         合并进宿主 manifest 时才展开成宿主包名（androidx.work 的 startup provider 同一套做法）。
+         写死字符串看着更省事，但 authority 在全设备唯一：两个装了本组件的 App 互相装不上，
+         模块自己的 androidTest stub APK 也会和宿主撞车（实测 INSTALL_FAILED_CONFLICTING_PROVIDER）。
+         运行期拼的是 ShareFiles.authority()，两边必须一致。 -->
+    <!-- B4：扫描四页入住模块。相对名对着上面的 package 解析，
+         所以是 .ui.ScanActivity 而不是全限定名；宿主只需 project(':scanner')，
+         合并后 manifest 里自动出现这四条。
+         四条都显式写了 theme：不写就等于把模块的观感交给宿主的 application theme 决定，
+         宿主换一套非 Material3 的主题就会在 inflate 时崩。 -->
+    <application>
+        <activity
+            android:name=".ui.ScanActivity"
+            android:exported="false"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.Scanner.Camera" />
+
+        <activity
+            android:name=".ui.CropActivity"
+            android:exported="false"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.Scanner.Camera" />
+
+        <activity
+            android:name=".ui.PageListActivity"
+            android:exported="false"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.Scanner" />
+
+        <activity
+            android:name=".ui.PdfPreviewActivity"
+            android:exported="false"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.Scanner" />
+
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="${applicationId}.scanner.fileprovider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/scanner_file_paths" />
+        </provider>
+    </application>
+
+</manifest>

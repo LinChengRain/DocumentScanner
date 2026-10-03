@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="scanner_filter_names">
+        <item>@string/scanner_filter_original</item>
+        <item>@string/scanner_filter_enhanced</item>
+        <item>@string/scanner_filter_grayscale</item>
+        <item>@string/scanner_filter_binary</item>
+        <item>@string/scanner_filter_color_magic</item>
+    </string-array>
+</resources>

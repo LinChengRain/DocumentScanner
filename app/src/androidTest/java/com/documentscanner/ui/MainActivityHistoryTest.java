@@ -12,9 +12,9 @@ import androidx.test.core.app.ActivityScenario;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 
 import com.documentscanner.R;
-import com.documentscanner.model.ScanPage;
-import com.documentscanner.model.ScanSession;
-import com.documentscanner.model.SessionFixtures;
+import com.documentscanner.scanner.model.ScanPage;
+import com.documentscanner.scanner.model.ScanSession;
+import com.documentscanner.scanner.model.SessionFixtures;
 
 import org.junit.After;
 import org.junit.Before;
