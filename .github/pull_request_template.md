@@ -4,8 +4,12 @@
 
 ## 验证
 
-- [ ] `gradle testDebugUnitTest`（或 `./gradlew :app:testDebugUnitTest`）通过
-- [ ] `gradle assembleDebug` 通过
+- [ ] `./gradlew :scanner:testDebugUnitTest :app:testDebugUnitTest` 通过（纯逻辑单测现在全在 `:scanner`，
+      只跑 `:app` 那一份会报绿但零执行）
+- [ ] `./gradlew :app:assembleDebug :scanner:assembleRelease :app:assembleRelease` 通过
+      （release 那两条不是多余：R8、`shrinkResources`、`consumerProguardFiles` 只在 release 路上生效）
+- [ ] 动了 androidTest 或被 androidTest 覆盖的产品代码，已跑 `connectedDebugAndroidTest`
+      （`:scanner` 与 `:app` 各一次，两个模块都有用例）
 - [ ] 涉及算法 / 渲染 / 会话落盘的改动已补对应 instrumentation 用例
 
 > 本仓库的测试按「变异验证」标准写：每条断言都要能因对应实现被改坏而失败，

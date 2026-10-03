@@ -297,7 +297,13 @@ consumer keep 管 aapt 看不见的那些——只被反射或动态构造的 Vi
 `switch` 转发——两种都比多一个 import 更贵。真要把面收硬的做法是把档位数值也搬进 `api/`，
 让 `cv` 反过来依赖门面，那是另一次边界改动，不在这一批。
 
-## 10. 进度（截至 F6）
+G1 复核补一句，免得后来人按 grep 下结论：演示宿主现在**没有**调用 `setImageBudget`
+（`grep 'ImageBudget\|ScannerConfig' app/src` 零命中，`DocumentScannerApp` 只有 warmUp 与 prepare），
+所以照着 app 侧 import 数只剩两处。但这条越界是**签名层面**的：`ScannerConfig.setImageBudget` 的
+入参类型就在 `cv` 包里，任何真去用体积档的宿主都必然 `import com.documentscanner.scanner.cv.ImageBudget`。
+「三处」按公开面算，不按 demo 用没用算。
+
+## 10. 进度（截至 G1）
 
 - B1 `14c5a3f`：`:scanner` 骨架 + `util/`。
 - B2 `d414c58`：`cv/` + `camera/`；`PageRenderer` 因依赖 `model.ScanPage` 暂留宿主。
@@ -569,4 +575,26 @@ consumer keep 管 aapt 看不见的那些——只被反射或动态构造的 Vi
   - 覆盖缺口诚实记一条：`exportFitting` 里 `write >= MAX_ATTEMPTS` 那半边守卫没有真机用例钉——
     标定之后的循环总是先撞上「装得进去」或「踩到下限」，四轮的天花板只在 JVM 侧
     `theDescentTerminatesWithinTheAttemptCap` 里被模拟。
+
+- G1（门禁补全，基线 `2daf255`）：CI 从「只跑宿主」补成真正把组件关住。
+  - 现状与问题：模块化整批落地时没动 `.github/workflows/ci.yml`，它还停在单模块口径——只跑
+    `:app:testDebugUnitTest`（本树已 `NO-SOURCE`，等于一条都不跑）+ `:app:assembleDebug`。
+    于是 71 例 JVM 单测、R8、`shrinkResources`、`consumerProguardFiles` 的传播，PR 上一律无人验证；
+    而 README §7 当时已经写着 CI 会跑 `:scanner` 那两条，是文档在前、门禁在后的一次「写了但没做」。
+  - 补的四步：`:scanner:testDebugUnitTest` + `:app:testDebugUnitTest`（宿主那条留着，理由见 §10 B3
+    那条——只跑一侧会报绿但零执行）；`:scanner:assembleRelease`（AAR 脱离 demo 宿主也得能出）；
+    `:app:assembleRelease`（keep 规则、资源收缩只在 release 这条路生效）。三个产物都上传。
+  - 顺带修一条会被踩的坑：CI 里补了「runner 没有 `platforms/android-31` 就用自带 sdkmanager 现装」。
+    README 早就写着有这一步，实际在「构建脚本清理」那次被删了——当时 compileSdk 还是 34，用不上；
+    降到 31 之后它变成必需，而 AGP 4.1.3 不会自己把缺的平台拉下来。**这条是本次唯一在本地无法证伪的改动**，
+    它唯一的验证是第一次 Actions 运行。
+  - 门禁自己的变异验证（改坏实现，看新步骤是否变红）：
+    M2 把 `QuadGeometry.rotateNormalized90Clockwise` 的方向写反 → `:scanner:testDebugUnitTest` 红
+    （`rotatingNormalizedQuad_matchesRotatingPixelQuad`），旧 CI 全绿；
+    M3 在 `scanner/consumer-rules.pro` 里写一条 `-keepa`（R8 才解析它）→ `:app:assembleDebug` 绿、
+    `:app:assembleRelease` 红（`proguard.txt:25: R8: Unknown option "-keepa"`），这就是旧 CI 看不见的那一类。
+  - 一条等价变种如实记下来：M1 把 `QuadGeometry.MIN_USABLE_AREA_RATIO` 从 0.01 降到 0.001，
+    全绿抓不住。根因是 `isUsableQuad_rejectsTinySelection` 用的是 12×12（占 1000×1000 的 0.014%），
+    任何高于 0.000144 的门限都能让它通过，所以这条断言钉的是「极小要拒」而不是「门限在哪」。
+    与 `MIN_DECODE_EDGE`、`MAX_ATTEMPTS` 同一类：数值是产品判断，没有边界成对的用例守着。
 

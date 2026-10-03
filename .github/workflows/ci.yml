@@ -7,7 +7,7 @@ on:
 
 jobs:
   build:
-    name: Unit tests + debug build
+    name: Unit tests + debug & release builds
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -25,14 +25,61 @@ jobs:
           gradle-version: '7.6.4'
           cache-read-only: ${{ github.ref != 'refs/heads/main' }}
 
+      # compileSdk 31 不保证在 runner 镜像里预装（镜像只保最近的几个版本），
+      # 而 AGP 4.1.3 又没把「缺平台自己下载」这条路留稳（android.builder.sdkDownload
+      # 在新版 AGP 里已经移除）。所以缺就现装、装过就跳过。
+      # 诚实记一条：这一步在本地无法证伪——它唯一的验证就是第一次 Actions 运行。
+      - name: Ensure Android SDK platform 31
+        run: |
+          set -euo pipefail
+          SDKMGR="${ANDROID_HOME}/cmdline-tools/latest/bin/sdkmanager"
+          [ -d "${ANDROID_HOME}/platforms/android-31" ] \
+            || yes | "${SDKMGR}" "platforms;android-31"
+          # AGP 4.1.3 默认的 build-tools；宿主没写 buildToolsVersion，就按这个下限取
+          [ -d "${ANDROID_HOME}/build-tools/30.0.2" ] \
+            || yes | "${SDKMGR}" "build-tools;30.0.2"
+
+      # 两个模块都跑。:app 现在是 NO-SOURCE（宿主的 JVM 单测全跟着代码搬进 :scanner 了），
+      # 留着这条是防宿主哪天加回单测却漏跑——曾经踩过一次：B3 把 ExportNamesTest 搬走之后，
+      # 只跑 :app 的 CI 变成一条单测都不跑还报绿。
       - name: Unit tests
-        run: gradle --no-daemon -PuseChineseMirror=false :app:testDebugUnitTest
+        run: >-
+          gradle --no-daemon -PuseChineseMirror=false
+          :scanner:testDebugUnitTest
+          :app:testDebugUnitTest
 
       - name: Assemble debug APK
         run: gradle --no-daemon -PuseChineseMirror=false :app:assembleDebug
+
+      # 组件本体的产物：脱离 demo 宿主也得能出包。AAR 不含 OpenCV——
+      # implementation 依赖是传递坐标，那份 21MB 的 native 库由宿主解析后才进 APK。
+      - name: Assemble release AAR
+        run: gradle --no-daemon -PuseChineseMirror=false :scanner:assembleRelease
+
+      # R8（minifyEnabled）、shrinkResources、consumerProguardFiles 的传播都只在 release
+      # 这条路上生效。只出 debug 包的 CI 永远碰不到它们——而 keep 规则出问题恰恰是
+      # release 装机才炸的那一类。
+      - name: Assemble release APK
+        run: gradle --no-daemon -PuseChineseMirror=false :app:assembleRelease
 
       - uses: actions/upload-artifact@v4
         with:
           name: app-debug
           path: app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: app-release
+          path: app/build/outputs/apk/release/app-release.apk
+          if-no-files-found: error
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: scanner-aar
+          path: scanner/build/outputs/aar/scanner-release.aar
+          if-no-files-found: error
+
+      # 产物体积**不能**拿这里的数字当基线：CI 用构建缓存（main 之外只读），
+      # 带缓存的产物会多出 zip 首条目之前那段对齐占位（实测 1,079,414 B），
+      # 看着像涨了 1MB。要比体积得在本地 clean + --no-build-cache 出包，见 README 第 1 节。

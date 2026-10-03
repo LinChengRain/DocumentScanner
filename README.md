@@ -625,8 +625,14 @@ RecyclerView：一页接一页从上往下排，长文档滚动而不是逐页�
 Material Components（Apache 2.0）、Guava（Apache 2.0）。
 
 欢迎提 Issue 与 Pull Request（仓库带 Issue / PR 模板）。每个 PR 会由 GitHub Actions 跑
-`:app:testDebugUnitTest` + `:scanner:testDebugUnitTest`，再出 `:app:assembleDebug` 与
-`:scanner:assembleRelease`（后者是组件本体的 AAR，脱离 demo 首页也得能构建）（官方源、JDK 17）。
+`:scanner:testDebugUnitTest` + `:app:testDebugUnitTest`，再出 `:app:assembleDebug`、
+`:scanner:assembleRelease`（组件本体的 AAR，脱离 demo 首页也得能构建）与
+`:app:assembleRelease`（官方源、JDK 17）。release APK 那一步不是多余的：R8、`shrinkResources`
+和 `consumerProguardFiles` 的传播只在 release 这条路上生效，只出 debug 包的 CI 碰都碰不到，
+而 keep 规则出问题恰恰是装机包才炸的那一类。runner 镜像里若没有 `platforms/android-31`，
+CI 会先用自带的 sdkmanager 现装（AGP 4.1.3 不替你把缺的平台拉下来）。
+CI 不跑 instrumentation 用例（需要设备，见上文的真机命令），也不该拿 CI 上传的 APK 比体积
+——那条走构建缓存，会多出一段 zip 对齐占位。
 改动算法或渲染链路时请补对应用例——本仓库的测试是「变异验证」写出来的：
 每条断言都要能因对应的实现被改坏而失败，否则它不算是覆盖。纯逻辑放被改代码所在模块的
 `src/test`（无需设备），要真实 Context / OpenCV / Activity 的放同侧 `src/androidTest`；
